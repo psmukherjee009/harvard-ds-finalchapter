@@ -1078,7 +1078,7 @@ Random Forest Model has beaten DJIA 7 out of the last 8 years(Except 2019).
 As far as accuracy of the measurement is concerned, this is how the predicted rank 1 vs actual rank on the next week is
  distributed
 ```{r predicted_rank1-rank, include=FALSE}
-load("../tmodels.Rda")
+load("tmodels.Rda")
 # Add Prediticted Outcome in the test set and generate rank per date
 td <- cbind(timed_test_set, PredictedOutcome=hat_lm_5_1_t) %>%
       group_by(Date) %>%
