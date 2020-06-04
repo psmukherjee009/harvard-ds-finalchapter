@@ -1,0 +1,1125 @@
+---
+title: "Financial Forecasting of Dow Jones Index Stocks"
+author: "Partha Sarathi Mukherjee"
+date: 5/24/2020
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+# Overview
+This project is related to "Choose your own" project for HarvardX: PH125.9x Data Science: Capstone course. The objective of the course is to build a complex machine learning algorithm to solve a real-life problem.
+
+## Introduction
+The Dow Jones Industrial Average (DJIA), Dow Jones, or simply the Dow, is a stock market index that measures the stock performance of 30 large companies listed on stock exchanges in the United States. More details of the DOW can be found https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average.
+
+University of Maryland project (https://archive.ics.uci.edu/ml/datasets/Dow+Jones+Index#) used 2 quarter (Jan to June
+ 2011) of Dow Jones Industrial Average(DJIA) stocks to build a stock forecasting model. The goal of the project was to find the stock which will provide the greatest rate of return if you buy the stock next week open and close the position before the weekend.
+
+Looking into only 2 quarters of data is very limiting. For this project, we will use 20 years(1999-2019) of weekly data.
+More precisely from the first Monday of 1999 to the last Friday in 2019.
+This big-time period will provide a robust model that will see the euphoria(2000 and 2007) and despair (2002 and 2008).
+
+## Challenges
+There are many challenges in forecasting Stock prices.
+
+### Individual Stock Issues
+Forecasting stock movement in the future is very dicey as the future is unknown. Also, an individual stock is affected by many unforeseen events like a news report, natural calamity, earning surprises, etc.
+Also stock has asymmetric moves from planned events and explosive move on surprise events like earning surprise.
+
+In this project, we will just accept these risks and assume that over time the deltas will balance out.
+
+### DOW issues
+The DOW stock composition changed over the years and the events are documented here
+https://en.wikipedia.org/wiki/Historical_components_of_the_Dow_Jones_Industrial_Average.
+This will pose a challenge to the data needed to reflect these changes. We know that a stock tends to get bumped when
+ added to DJIA and dumped when dropped off the index.
+
+In this project, current DJIA listed stocks will be used but limit the data to the date the stock was added to DJIA.
+This will introduce survival bias.
+
+## Data Ingestion
+The current DJIA list consists of symbols
+MMM, AXP, AAPL, BA, CAT, CVX, CSCO, KO, DOW, XOM, GS, HD, IBM, INTC, JNJ, JPM, MCD, MRK, MSFT, NKE, PFE, PG, RTX, TRV
+, UNH, VZ, V, WMT, WBA, DIS
+
+Details of each symbol and the companies associated are detailed in the components section of https://en.wikipedia.org/wiki
+/Dow_Jones_Industrial_Average
+
+The weekly data for each DJIA stock will be obtained from Yahoo Finance. The steps are detailed below
+
+### MMM (3M Company)
+3M Company was added to DJIA as Minnesota Mining & Manufacturing Company on Aug 9, 1976.
+
+Minnesota Mining & Manufacturing Company was renamed as 3M Company on Jan 27, 2003.
+
+MMM weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/MMM?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### AXP (American Express Company)
+American Express Company was added to DJIA on Aug 30, 1982.
+
+AXP weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/AXP?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### AAPL (Apple Inc.)
+Apple Inc. was added to DJIA on Mar 19, 2015.
+
+AAPL weekly stock prices from Mar 19, 2015, to 2019 can be downloaded from the link. But to better align with Weekly
+ data we take the prices from the following week i.e., Mar 23, 2015.
+
+https://query1.finance.yahoo.com/v7/finance/download/AAPL?period1=1427068800&period2=1578009600&interval=1wk&events=history
+
+### BA (The Boeing Company)
+The Boeing Company was added to DJIA on Mar 12, 1987.
+
+BA weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/BA?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### CAT (Caterpillar Inc.)
+Caterpillar Inc. was added to DJIA on May 6, 1991.
+
+CAT weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/CAT?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### CVX (Chevron Corporation)
+Chevron Corporation was added to DJIA on Oct 30, 1985.
+
+CVX weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/CVX?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### CSCO (Cisco Systems, Inc.)
+Cisco Systems, Inc. was added to DJIA on Jun 8, 2009.
+
+CSCO weekly stock prices from Jun 8, 2009, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/CSCO?period1=1244419200&period2=1578009600&interval=1wk&events=history
+
+### KO (The Coca-Cola Company)
+The Coca-Cola Company was added to DJIA on May 26, 1932, like Coca-Cola, Drug Inc, and dropped on Nov 20, 1935.
+
+The Coca-Cola Company was again added back on Mar 12, 1987.
+
+The stock is also called Knock Out for its symbol KO.
+
+KO weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/KO?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### DOW (Dow Chemical Company)
+Dow Chemical Company was added to DJIA on Nov 20, 1935, like DuPont.
+
+On Sep 1, 2017, DuPont merged with the Dow Chemical Company under the name DowDuPont.
+
+On Apr 2, 2019, DowDuPont spun off DuPont and was replaced by Dow Chemical Company.
+
+DOW weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/DOW?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### XOM (Exxon Mobil Corporation)
+Exxon Mobil Corporation was added to DJIA on Oct 1, 1928, as Standard Oil (NJ).
+
+Jan 27, 2003, upon merging with Mobil, Exxon Corporation changed its name to Exxon Mobil Corporation.
+
+Aug 9, 1976, Standard Oil (NJ) changed its name to Exxon Corporation.
+
+XOM is the largest direct descendant of John D. Rockefeller's Standard Oil
+
+XOM weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/XOM?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### GS (The Goldman Sachs Group, Inc.)
+The Goldman Sachs Group, Inc. was added to DJIA on Sep 23, 2013.
+
+GS weekly stock prices from Sep 23, 2013, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/GS?period1=1379894400&period2=1578009600&interval=1wk&events=history
+
+### HD (The Home Depot)
+The Home Depot was added to DJIA on Nov 1, 1999.
+
+HD weekly stock prices from Nov 1, 1999, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/HD?period1=941414400&period2=1578009600&interval=1wk&events=history
+
+### INTC (Intel Corporation)
+Intel Corporation was added to DJIA on Nov 1, 1999.
+
+INTC weekly stock prices from Nov 1, 1999, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/INTC?period1=941414400&period2=1578009600&interval=1wk&events=history
+
+### IBM (International Business Machines Corporation)
+International Business Machines Corporation on May 26, 1932.
+
+IBM weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/IBM?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### JNJ (Johnson & Johnson)
+Johnson & Johnson was added to DJIA on Mar 17, 1997.
+
+JNJ weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/JNJ?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### JPM (JPMorgan Chase & Co.)
+JPMorgan Chase & Co. was added to DJIA on May 6th, 1991.
+
+Jan 27, 2003, J.P. Morgan & Company changed its name to JPMorgan Chase & Co.
+
+JPM weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/JPM?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### MCD (McDonald's Corporation)
+McDonald's Corporation was added to DJIA on Oct 30, 1985.
+
+MCD weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/MCD?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### MRK (Merck & Co., Inc.)
+Merck & Co., Inc. was added to DJIA on Jun 29, 1979.
+
+MRK weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/MRK?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### MSFT (Microsoft Corporation)
+Microsoft Corporation was added to DJIA on Nov 1, 1999.
+
+MSFT weekly stock prices from Nov 1, 1999, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/MSFT?period1=941414400&period2=1578009600&interval=1wk&events=history
+
+### NKE (Nike, Inc.)
+Nike, Inc. was added to DJIA on Sep 23, 2013.
+
+NKE weekly stock prices from Sep 23, 2013, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/NKE?period1=1379894400&period2=1578009600&interval=1wk&events=history
+
+### PFE (Pfizer Inc.)
+Pfizer Inc. was added to DJIA on Apr 8, 2004.
+
+PFE weekly stock prices from Apr 8, 2004, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/PFE?period1=1081382400&period2=1578009600&interval=1wk&events=history
+
+### PG (The Procter & Gamble Company)
+The Procter & Gamble Company added to DJIA on May 26, 1932.
+
+PG weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/PG?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### RTX (Raytheon Technologies)
+United Aircraft was added to DJIA on Jul 18, 1930.
+
+Apr 3rd, 2020, Raytheon Technologies was created after United Technologies merged with Raytheon Company.
+
+Aug 9, 1976, United Aircraft changed its name to United Technologies Corporation.
+
+Mar 4, 1939, United Aircraft is added back to DJIA.
+
+Aug 15, 1933, United Aircraft was dropped off DJIA.
+
+PG weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/RTX?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### TRV (The Travelers Companies, Inc.)
+The Travelers Companies, Inc. was added to DJIA on Jun 8, 2009.
+
+Travelers Inc. existed with a long history from 1863. Numerous mergers lead to Travelers losing its identity and
+ former company stock may not reflect the current company so data from Jun 8, 2009, will be used.
+
+TRV weekly stock prices from Jun 8, 2009, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/TRV?period1=1244419200&period2=1578009600&interval=1wk&events=history
+
+### UNH (UnitedHealth Group Inc.)
+UnitedHealth Group Inc. was added to DJIA on Sep 24, 2012.
+
+UNH weekly stock prices from Sep 24, 2012, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/UNH?period1=1348444800&period2=1578009600&interval=1wk&events=history
+
+### VZ (Verizon Communications, Inc.)
+Verizon Communications, Inc. was added to DJIA on Apr 08, 2004.
+
+VZ weekly stock prices from Apr 08, 2004, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/VZ?period1=1081382400&period2=1578009600&interval=1wk&events=history
+
+### V (Visa Inc.)
+Visa Inc. was added in DJIA at Sep 23, 2013
+
+V weekly stock prices from Sep 23, 2013, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/V?period1=1379894400&period2=1578009600&interval=1wk&events=history
+
+### WBA (Walgreens Boots Alliance)
+Walgreens Boots Alliance was added to DJIA on Jun 26, 2018.
+
+WBA weekly stock prices from Jun 26, 2018, to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/WBA?period1=1529971200&period2=1578009600&interval=1wk&events=history
+
+### WMT (Walmart)
+Walmart was added to DJIA on Mar 17, 1997.
+
+WMT weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/WMT?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+### DIS (The Walt Disney Company)
+The Walt Disney Company was added to DJIA on May 06, 1991.
+
+DIS weekly stock prices from 1999 to 2019 can be download from the link
+
+https://query1.finance.yahoo.com/v7/finance/download/DIS?period1=915408000&period2=1578009600&interval=1wk&events=history
+
+## Outcome Measurement
+The outcome will be measured based on the percentage difference between next week's open vs close.
+
+Performance of the Model will be measured in 2 ways:-
+
+ 1. How well is the model outcome mimic the actual Outcome
+
+ 2. How well the best-predicted outcome performed vs the actual outcome.
+
+# Methods and Analysis
+The downloaded data starts in the first week of Jan from 4th Jan 1999 to 27th Dec 2019.
+
+Downloading Raw Data from Yahoo Finance.
+```{r loading-libs, include=FALSE}
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
+if(!require(Rborist)) install.packages("Rborist", repos = "http://cran.us.r-project.org")
+```
+
+```{r download-data, include=FALSE}
+if(!dir.exists("data")) dir.create("data")
+tickers <- c("MMM", "AXP", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO", "DOW", "XOM", "GS", "HD", "IBM", "INTC", "JNJ",
+           "JPM", "MCD", "MRK", "MSFT", "NKE", "PFE", "PG", "RTX", "TRV", "UNH", "VZ", "V", "WMT", "WBA", "DIS")
+url_tmpl <- "https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%s&period2=1578009600&interval=1wk&events=history"
+data_map <- tibble(
+start_period = c(915408000, 915408000, 1427068800, 915408000, 915408000, 915408000, 1244419200, 915408000, 915408000,
+                 915408000, 1379894400, 941414400, 941414400, 941414400, 941414400, 941414400, 941414400, 941414400,
+                 941414400, 1379894400, 1081382400, 915408000, 915408000, 1244419200, 1348444800, 1081382400,
+                 1379894400, 1529971200, 915408000, 915408000),
+tickers = tickers
+)
+
+
+download_data <- function(ticker, start_period) {
+  url <- sprintf(url_tmpl, ticker, start_period)
+  message(sprintf("Downloading: %s from %s", ticker, url))
+  download.file(url, paste0("data/", ticker, ".csv"))
+  1
+}
+#ret <- mapply(download_data, data_map$tickers,  data_map$start_period)
+```
+The downloaded data is stored in the "data" directory.
+
+## Exploratory Data Analysis
+The first step is to make sure the data is clean and logical. The percentage of change every week is added to the data set.
+Analyze any move above or below 40% (Unusual move).
+
+Dig deeper into every Unusual move manually. Fix the data is if there is an error.
+
+For manual comparison, other data/chart sources like TradingView.com or google finance is used.
+
+```{r load-data, include=FALSE}
+load_data <- function(ticker) {
+  dt <- read_csv(paste0("data/", ticker, ".csv"))
+  cbind(dt, Ticker=ticker, Change=100*(dt$Close - dt$Open)/dt$Open)
+}
+data <- sapply(tickers, load_data)
+```
+```{r view-data}
+as.data.frame(data[,"MMM"]) %>% ggplot(aes(Date, Change, Ticker)) + geom_line() + ylab("MMM Change")
+as.data.frame(data[,"AXP"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("AXP Change")
+as.data.frame(data[,"AAPL"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("AAPL Change")
+as.data.frame(data[,"BA"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("BA Change")
+as.data.frame(data[,"CAT"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("CAT Change")
+as.data.frame(data[,"CVX"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("CVX Change")
+as.data.frame(data[,"CSCO"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("CSCO Change")
+as.data.frame(data[,"KO"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("KO Change")
+as.data.frame(data[,"DOW"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("DOW Change")
+as.data.frame(data[,"XOM"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("XOM Change")
+as.data.frame(data[,"GS"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("GS Change")
+as.data.frame(data[,"HD"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("HD Change")
+as.data.frame(data[,"IBM"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("IBM Change")
+as.data.frame(data[,"INTC"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("INTC Change")
+as.data.frame(data[,"JNJ"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("JNJ Change")
+as.data.frame(data[,"JPM"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("JPM Change")
+# JPM has a spike up of more than 40%. Unusual
+head(as.data.frame(data[,"JPM"]) %>% arrange(desc(Change)))
+# 2009-03-09  15.37000  24.33000  15.02000  23.75000  18.154913 709754000    JPM  54.52179571
+# Turns out it is correct when market bottomed in Mar 2009
+
+as.data.frame(data[,"MCD"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("MCD Change")
+as.data.frame(data[,"MRK"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("MRK Change")
+as.data.frame(data[,"MSFT"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("MSFT Change")
+as.data.frame(data[,"NKE"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("NKE Change")
+as.data.frame(data[,"PFE"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("PFE Change")
+as.data.frame(data[,"PG"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("PG Change")
+# PG has a spike down of nearly 40%. Unusal
+head(as.data.frame(data[,"PG"]) %>% arrange(Change))
+# PG gapped down on bad earning mid week on 2000-03-06. This is legit
+# 1 2000-03-06 44.18750 44.21875 26.37500 26.87500  15.58277 298318800     PG -39.17963
+
+as.data.frame(data[,"RTX"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("RTX Change")
+# A lot of Unusual and bizzare moves. Lets dig deeper.
+head(as.data.frame(data[,"RTX"]) %>% arrange(Change) %>% select(Ticker, Date, Open, High, Low, Close, Change), 55)
+# 37 data points are having an spike down greater than 90%
+#1  2006-09-04 2579.90991 2579.90991 39.15041 39.86155 28.926479  17996700    RTX -98.454925
+#2  2008-09-01 2456.66992 2456.66992 40.07552 40.32725 30.277899  42480900    RTX -98.358459
+#3  2010-01-18 2315.10010 2315.10010 43.42354 43.47389 33.821892  29045500    RTX -98.122160
+#4  2011-07-04 2743.62988 2743.62988 56.14852 56.85966 45.790684  30531000    RTX -97.927575
+#5  2006-01-02 1612.90002 1612.90002 34.90245 35.34298 25.336058  20377500    RTX -97.808731
+#6  2012-09-03 2031.19995 2031.19995 48.76652 49.97483 41.538990  30980900    RTX -97.539640
+#7  2013-01-21 2276.37012 2276.37012 54.33606 56.50724 47.297348  28567300    RTX -97.517660
+#8  2013-02-18 2230.39990 2230.39990 55.70799 56.94776 47.951168  23638200    RTX -97.446746
+#9  2004-09-06 1028.87000 1028.87000 29.48395 29.71051 20.865843  20278000    RTX -97.112316
+#10 2005-02-21 1064.93994 1064.93994 31.03839 31.78729 22.501221  23522400    RTX -97.015110
+#11 2013-05-27 1965.45996 1965.45996 59.66646 59.72310 50.570084  23097600    RTX -96.961368
+#12 2005-05-30 1026.57996 1026.57996 33.36060 33.43298 23.766071  21545600    RTX -96.743266
+#13 2014-01-20 1951.56995 1951.56995 70.33984 70.35872 60.206238  30168900    RTX -96.394763
+#14 2019-05-27 1916.51001 1916.51001 78.99937 79.48395 77.335411  20878500    RTX -95.852672
+#15 2019-01-21 1714.64001 1714.64001 69.63499 72.88232 70.106575  50732700    RTX -95.749410
+#16 2002-02-18  509.64002  509.64002 21.41598 21.93203 14.820339  30178400    RTX -95.696564
+#17 2017-01-16 1586.12000 1586.12000 68.84834 69.72310 64.076569  17165700    RTX -95.604172
+#18 2016-12-26 1555.54004 1555.54004 68.83575 68.98679 63.399899  12817000    RTX -95.565091
+#19 2017-01-02 1587.52002 1587.52002 69.22593 70.83071 65.094505  18746700    RTX -95.538279
+#20 2017-02-20 1556.03003 1556.03003 70.30837 70.77407 65.429504  17053100    RTX -95.451626
+#21 2017-09-04 1478.12000 1478.12000 68.65953 68.94273 64.474068  52380400    RTX -95.335782
+#22 2018-05-28 1674.57996 1674.57996 78.18124 79.17558 75.323517  18521200    RTX -95.271914
+#23 2018-02-19 1770.60999 1770.60999 79.21963 83.79484 79.270821  39849400    RTX -95.267459
+#24 2018-01-15 1771.27002 1771.27002 83.66898 85.52549 80.461044  24746200    RTX -95.171516
+#25 2016-09-05 1325.75000 1325.75000 64.61296 64.61925 59.022083  21075200    RTX -95.125834
+#26 2016-05-30 1257.59998 1257.59998 62.14600 63.20327 57.379700  20327200    RTX -94.974294
+#27 2015-05-25 1456.93994 1456.93994 73.25991 73.73820 65.160629  23460900    RTX -94.938831
+#28 2017-12-25 1584.81006 1584.81006 79.87414 80.28320 75.529175   9666300    RTX -94.934207
+#29 2016-07-04 1276.87000 1276.87000 62.49843 65.23600 59.225140  25571700    RTX -94.890944
+#30 2018-01-01 1597.64001 1597.64001 80.03146 82.80051 77.897408  24533400    RTX -94.817324
+#31 2017-05-29 1467.68005 1467.68005 76.14852 76.85337 71.438110  19697500    RTX -94.763615
+#32 2018-09-03 1581.17004 1581.17004 82.14600 83.07741 79.457672  19623500    RTX -94.745827
+#33 2015-09-07 1079.56006 1079.56006 57.19950 58.10573 51.682026  32112200    RTX -94.617647
+#34 2016-02-15  956.65997  956.65997 53.84518 55.52549 49.706249  45948500    RTX -94.195902
+#35 2016-01-18  860.17999  860.17999 52.47955 54.34235 48.647114  43636200    RTX -93.682444
+#36 2001-05-28  396.23001  396.23001 25.66709 26.17055 17.496731  17148500    RTX -93.395112
+#37 2015-01-19 1077.91003 1077.91003 72.93896 75.50661 66.003761  37349100    RTX -92.995092
+head(as.data.frame(data[,"RTX"]) %>% arrange(desc(Change)) %>% select(Ticker, Date, Open, High, Low, Close, Change), 25)
+# 9 data point has a spike up of more than 1000%
+#1  2008-06-30 38.48332 3180.08008 37.47640 3180.08008 2376.131836  61760600    RTX 8163.527972
+#2  2011-04-18 51.99497 2886.66992 51.09503 2886.66992 2312.010498  36068500    RTX 5451.825878
+#3  2018-03-26 77.99874 1771.87000 77.68407 1771.87000 1676.208008  42110500    RTX 2171.664866
+#4  2019-04-15 84.95909 1862.05005 84.37382 1862.05005 1801.777588  14551000    RTX 2091.701944
+#5  2017-04-10 71.10761 1448.89001 70.37130 1448.89001 1339.475464  14868100    RTX 1937.601818
+#6  2016-03-21 62.35368 1174.79004 61.67401 1174.79004 1059.509277  21593300    RTX 1784.074908
+#7  2015-06-29 70.95029 1281.63000 68.73505 1281.63000 1132.545166  30757200    RTX 1706.377478
+#8  2015-12-21 58.53996 1048.33997 58.33228 1048.33997  938.470764  30846700    RTX 1690.810777
+#9  2015-12-28 60.40277 1024.06006 60.22656 1024.06006  916.735535  20674000    RTX 1595.386006
+
+as.data.frame(data[,"TRV"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("TRV Change")
+as.data.frame(data[,"UNH"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("UNH Change")
+as.data.frame(data[,"VZ"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("VZ Change")
+as.data.frame(data[,"V"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("V Change")
+as.data.frame(data[,"WMT"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("WMT Change")
+as.data.frame(data[,"WBA"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("WBA Change")
+# 3 bad data point on spike down
+#1  2013-03-25 46.4300 47.76000  1.0000  1.00000  0.842636  27628500    WBA -97.846220
+#2  2012-04-02 33.5600 34.73000  1.0200  1.02000  0.834645  41351600    WBA -96.960668
+#3  2008-06-30 32.9600 33.05000  2.0000  2.00000  1.525111  36779000    WBA -93.932039
+head(as.data.frame(data[,"WBA"]) %>% arrange(desc(Change)) %>% select(Ticker, Date, Open, High, Low, Close, Change), 35)
+# 28 bad data points in spike up greater than 1000%.
+#1  2011-07-04  0.450 44.2600  0.4500 44.0700  35.36953 23212100    WBA 9693.33333
+#2  2011-05-30  0.500 44.0600  0.5000 43.1500  34.63117 24426700    WBA 8530.00040
+#3  2011-02-21  0.600 42.5400  0.6000 41.9700  33.55104 26158700    WBA 6895.00017
+#4  2011-01-17  0.600 42.2000  0.6000 41.6900  33.18947 23169900    WBA 6848.33317
+#5  2013-05-27  1.000 51.2500  1.0000 47.7600  40.47093 19501900    WBA 4675.99980
+#6  2013-02-18  1.000 41.9900  1.0000 41.8100  35.23062 20187200    WBA 4081.00010
+#7  2013-01-21  1.000 39.8100  1.0000 39.6700  33.20824 19536500    WBA 3866.99980
+#8  2010-09-06  0.790 29.1200  0.7900 28.9600  22.94061 21086700    WBA 3565.82266
+#9  2012-09-03  1.000 36.1900  1.0000 34.9400  29.01172 37422400    WBA 3393.99990
+#10 2012-10-29  1.000 35.6900  1.0000 34.8900  28.97020 19209700    WBA 3388.99990
+#11 2011-09-05  1.050 36.4500  1.0500 35.3300  28.52729 33170700    WBA 3264.76210
+#12 2010-07-05  0.900 28.4100  0.9000 28.4000  22.35734 44954400    WBA 3055.55556
+#13 2012-05-28  1.000 31.6400  1.0000 29.9300  24.66038 26259100    WBA 2893.00000
+#14 2012-01-02  1.200 33.7000  1.2000 33.0800  26.89282 33590000    WBA 2656.66683
+#15 2011-12-26  1.200 35.1900  1.2000 33.0600  26.87657 27462600    WBA 2655.00008
+#16 2006-09-04  1.910 50.9900  1.9100 50.9100  38.23864 15307500    WBA 2565.44503
+#17 2007-01-15  2.110 46.6000  2.1100 46.0100  34.62063 12978100    WBA 2080.56863
+#18 2007-09-03  2.400 45.6900  2.4000 44.1500  33.40829 17974200    WBA 1739.58342
+#19 2012-02-20  2.000 34.8600  2.0000 33.8600  27.70696 26020500    WBA 1593.00005
+#20 2008-09-01  2.050 37.2400  2.0500 34.5900  26.45701 33758200    WBA 1587.31707
+#21 2008-05-26  2.250 36.2000  2.2500 36.0200  27.46725 20723000    WBA 1500.88889
+#22 2012-01-16  2.100 33.8900  2.1000 33.4800  27.21801 28197200    WBA 1494.28571
+#23 2008-02-18  2.400 37.4600  2.4000 37.4100  28.45269 25690500    WBA 1458.75000
+#24 2008-01-21  2.300 35.6600  2.3000 34.2800  26.00370 44686200    WBA 1390.43474
+#25 2009-01-19  1.900 27.3500  1.9000 26.9300  20.69978 34820500    WBA 1317.36842
+#26 2007-02-19  3.200 46.4900  3.2000 45.3200  34.16058 14911000    WBA 1316.25000
+#27 2007-01-01  3.280 46.6900  3.2800 45.5000  34.23689 13657200    WBA 1287.19512
+#28 2009-02-16  1.900 27.2500  1.9000 25.0800  19.35882 38485200    WBA 1220.00000
+
+as.data.frame(data[,"DIS"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("DIS Change")
+```
+
+## Raw Data Cleanup
+Turns out RTX and WBA data are dirty. Manually found out the correct values for each date. An update is applied during load using modules.
+
+Added an update module to fix all the bad prices just after the CSV file load. RTX and WBA change chart looks like this
+ after the fix.
+
+```{r loading-fixed-libs, include=FALSE}
+
+tickers = c("MMM", "AXP", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO", "DOW", "XOM", "GS", "HD", "IBM", "INTC", "JNJ",
+           "JPM", "MCD", "MRK", "MSFT", "NKE", "PFE", "PG", "RTX", "TRV", "UNH", "VZ", "V", "WMT", "WBA", "DIS")
+update_data <- function(dt, date, open, high, low, close, vol) {
+  idx <- which(dt$Date==date)
+  dt$Open[idx] <- open
+  dt$High[idx] <- high
+  dt$Low[idx] <- low
+  dt$Close[idx] <- close
+  dt$Volume[idx] <- vol
+  dt
+}
+
+rtx_update <- function(dt) {
+  dt <- update_data(dt, "2006-09-04",39.49,40.21,39.15,39.86,4499175)
+  dt <- update_data(dt,  "2008-09-01", 41.81,42.76,40.08,40.33,10620225)
+  dt <- update_data(dt,  "2010-01-18",45.31,45.90,43.42,43.47,7261375)
+  dt <- update_data(dt,  "2011-07-04",56.55,57.79,56.15,56.86,7632750)
+  dt <- update_data(dt,  "2006-01-02",35.53,35.75,34.90,35.34,5094375)
+  dt <- update_data(dt,  "2012-09-03",50.16,50.56,48.77,49.97,7745225)
+  dt <- update_data(dt,  "2013-01-21",54.52,56.52,54.34,56.51,7141825)
+  dt <- update_data(dt,  "2013-02-18",57.29,57.59,55.71,56.95,5909550)
+  dt <- update_data(dt,  "2004-09-06",29.89,29.99,29.48,29.71,5069500)
+  dt <- update_data(dt,  "2005-02-21",31.59,31.88,31.04,31.79,5880600)
+  dt <- update_data(dt,  "2013-05-27",60.38,60.81,59.67,59.72,5774400)
+  dt <- update_data(dt,  "2005-05-30",33.82,34.00,33.36,33.43,5386400)
+  dt <- update_data(dt,  "2014-01-20",72.27,74.39,70.34,70.36,7542225)
+  dt <- update_data(dt,  "2019-05-27",82.84,83.75,79.00,79.48,5219625)
+  dt <- update_data(dt,  "2019-01-21",71.12,75.11,69.63,72.88,12683175)
+  dt <- update_data(dt,  "2002-02-18",21.88,22.15,21.42,21.93,7544600)
+  dt <- update_data(dt,  "2017-01-16",69.09,70.23,68.85,69.72,4291425)
+  dt <- update_data(dt,  "2016-12-26",69.88,69.94,68.84,68.99,3204250)
+  dt <- update_data(dt,  "2017-01-02",69.47,71.01,69.23,70.83,4686675)
+  dt <- update_data(dt,  "2017-02-20",70.60,71.04,70.31,70.77,4263275)
+  dt <- update_data(dt,  "2017-09-04",72.74,72.94,68.66,68.94,13095100)
+  dt <- update_data(dt,  "2018-05-28",79.40,79.70,78.18,79.18,4630300)
+  dt <- update_data(dt,  "2018-02-19",81.03,84.91,79.22,83.79,9962350)
+  dt <- update_data(dt,  "2018-01-15",86.68,86.68,83.67,85.53,6186550)
+  dt <- update_data(dt,  "2016-09-05",67.34,67.65,64.61,64.62,5268800)
+  dt <- update_data(dt,  "2016-05-30",63.42,63.69,62.15,63.20,5081800)
+  dt <- update_data(dt,  "2015-05-25",74.61,74.65,73.26,73.74,5865225)
+  dt <- update_data(dt,  "2017-12-25",80.21,80.86,79.87,80.28,2416575)
+  dt <- update_data(dt,  "2016-07-04",64.25,65.29,62.50,65.24,6392925)
+  dt <- update_data(dt,  "2018-01-01",80.49,83.30,80.03,82.80,6133350)
+  dt <- update_data(dt,  "2017-05-29",76.65,77.31,76.15,76.85,4924375)
+  dt <- update_data(dt,  "2018-09-03",83.04,84.70,82.15,83.08,4905875)
+  dt <- update_data(dt,  "2015-09-07",57.99,59.06,57.20,58.11,8028050)
+  dt <- update_data(dt,  "2016-02-15",54.97,56.04,53.85,55.53,11487125)
+  dt <- update_data(dt,  "2016-01-18",54.34,54.99,52.48,54.34,10909050)
+  dt <- update_data(dt,  "2001-05-28",26.43,26.49,25.67,26.17,4287125)
+  dt <- update_data(dt,  "2015-01-19",73.37,76.12,72.94,75.51,9337275)
+  dt <- update_data(dt,  "2008-06-30",38.48,39.11,37.48,38.42,15440150)
+  dt <- update_data(dt,  "2011-04-18",51.99,54.92,51.10,54.81,9017125)
+  dt <- update_data(dt,  "2018-03-26",78.00,80.67,77.68,79.18,10527625)
+  dt <- update_data(dt,  "2019-04-15",84.96,86.69,84.37,86.22,3637750)
+  dt <- update_data(dt,  "2017-04-10",71.11,71.59,70.37,70.54,3717025)
+  dt <- update_data(dt,  "2016-03-21",62.35,62.68,61.67,62.34,5398325)
+  dt <- update_data(dt,  "2015-06-29",70.95,71.13,68.74,68.95,7689300)
+  dt <- update_data(dt,  "2015-12-21",58.54,60.79,58.33,60.60,7711675)
+  dt <- update_data(dt,  "2015-12-28",60.40,61.53,60.23,60.46,5168500)
+  dt
+}
+
+wba_update <- function(dt) {
+  dt <- update_data(dt,  "2013-03-25",46.43,47.76,46.09,47.68,6907125)
+  dt <- update_data(dt,  "2012-04-02",33.56,34.73,32.80,32.84,10337900)
+  dt <- update_data(dt,  "2008-06-30",32.96,33.05,31.25,31.45,9194750)
+  dt <- update_data(dt,  "2011-07-04",42.78,44.26,42.32,44.07,5803025)
+  dt <- update_data(dt,  "2011-05-30",43.99,44.06,42.60,43.15,6106675)
+  dt <- update_data(dt,  "2011-02-21",42.22,42.54,40.79,41.97,6539675)
+  dt <- update_data(dt,  "2011-01-17",41.45,42.20,41.07,41.69,5792475)
+  dt <- update_data(dt,  "2013-05-27",51.05,51.25,47.75,47.76,4875475)
+  dt <- update_data(dt,  "2013-02-18",41.31,41.99,41.31,41.81,5046800)
+  dt <- update_data(dt,  "2013-01-21",39.19,39.81,39.13,39.67,4884125)
+  dt <- update_data(dt,  "2010-09-06",28.16,29.12,28.12,28.96,5271675)
+  dt <- update_data(dt,  "2012-09-03",35.64,36.19,34.63,34.94,9355600)
+  dt <- update_data(dt,  "2012-10-29",35.27,35.69,34.75,34.89,6403233)
+  dt <- update_data(dt,  "2011-09-05",34.00,36.45,33.90,35.33,8292675)
+  dt <- update_data(dt,  "2010-07-05",27.09,28.41,26.45,28.40,11238600)
+  dt <- update_data(dt,  "2012-05-28",31.51,31.64,29.80,29.93,6564775)
+  dt <- update_data(dt,  "2012-01-02",33.45,33.70,32.32,33.08,8397500)
+  dt <- update_data(dt,  "2011-12-26",35.18,35.19,32.99,33.06,6865650)
+  dt <- update_data(dt,  "2006-09-04",49.97,50.99,49.83,50.91,3826875)
+  dt <- update_data(dt,  "2007-01-15",46.01,46.60,45.80,46.01,3244525)
+  dt <- update_data(dt,  "2007-09-03",45.01,45.69,43.78,44.15,4493550)
+  dt <- update_data(dt,  "2012-02-20",34.82,34.86,33.82,33.86,6505125)
+  dt <- update_data(dt,  "2008-09-01",36.66,37.24,34.04,34.59,8439550)
+  dt <- update_data(dt,  "2008-05-26",35.17,36.20,35.03,36.02,5180750)
+  dt <- update_data(dt,  "2012-01-16",32.93,33.89,32.82,33.48,7049300)
+  dt <- update_data(dt,  "2008-02-18",35.67,37.46,35.20,37.41,6422625)
+  dt <- update_data(dt,  "2008-01-21",32.50,35.66,32.50,34.28,11171550)
+  dt <- update_data(dt,  "2009-01-19",26.82,27.35,25.68,26.93,8705125)
+  dt <- update_data(dt,  "2007-02-19",45.83,46.49,45.13,45.32,3727750)
+  dt <- update_data(dt,  "2007-01-01",45.89,46.69,45.39,45.50,4552400)
+  dt <- update_data(dt,  "2009-02-16",25.73,27.25,24.99,25.08,9621300)
+  dt
+}
+
+load_data <- function(ticker) {
+  dt <- read_csv(paste0("data/", ticker, ".csv"))
+  if (ticker == "RTX") dt <- rtx_update(dt)
+  if (ticker == "WBA") dt <- wba_update(dt)
+  Chg <- 100*(dt$Close - dt$Open)/dt$Open
+  dx <- cbind(dt,
+              Ticker=ticker,
+              Change=Chg,
+              Outcome=lead(Chg, n=1),
+              ROC1=(dt$Close - lag(dt$Close, n=1))/dt$Close,
+              ROC2=(dt$Close - lag(dt$Close, n=2))/dt$Close
+              )
+  dx[4:length(dx$Close) - 1,]
+}
+
+data <- sapply(tickers, load_data)
+```
+```{r display_new_data, message=FALSE}
+as.data.frame(data[,"RTX"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("RTX Change after cleanup")
+as.data.frame(data[,"WBA"]) %>% ggplot(aes(Date, Change)) + geom_line() + ylab("WBA Change after cleanup")
+```
+
+Raw data is now sanitized, let's analyze the Raw data.
+
+## Data Analysis Strategies
+
+## Outcome Analysis
+
+### Check Outcomes
+
+Outcomes per Year.
+
+```{r see-outcome, include=FALSE}
+
+# Flatten the data into dedata
+# Returns Date,Col dataframe
+get_date_field <- function(ticker, col) {
+  dat2 <- bind_cols(data["Date", ticker], data[col, ticker])
+  colnames(dat2) <- c("Date", paste(ticker, col, sep="_"))
+  dat2
+}
+
+# Returns a data frame of Date, Col for all Tickers
+get_combined_field_data <- function(col) {
+  datr <- data.frame(stringsAsFactors = FALSE)
+  for (ticker in tickers) {
+    if (length(datr) == 0) {
+      datr <- get_date_field(ticker, col)
+    }
+    else {
+      datr <- full_join(datr, get_date_field(ticker, col), by="Date")
+    }
+  }
+  datr
+}
+
+# Find the ranks of the data points in each row and appends an extension with Rank column name
+get_ranks <- function(col) {
+  dat1 <- get_combined_field_data(col)
+  n_col <- ncol(dat1)
+  rank_data <- as.integer(rank(-dat1[1,2:n_col], na.last="keep"))
+  for (i in 2:nrow(dat1)) {
+    rank_data <- rbind(rank_data, as.integer(rank(-dat1[i,2:n_col], na.last="keep")))
+  }
+  colnames(rank_data) <- str_replace(colnames(dat1)[2:n_col], col, "Rank")
+  rank_data
+}
+
+denorm_data_with_ranks <- function(outcome_rank, change_rank) {
+  dedata <- data.frame()
+  for (ticker in tickers) {
+    x <- as.data.frame(data[,ticker])
+    or <- na.omit(outcome_rank[,paste0(ticker,"_Rank")])
+    or_1 <- c(or[2:length(or)], NA)
+    or_2 <- c(or[3:length(or)], NA, NA)
+    x <- mutate(x, Rank=or)
+    x <- mutate(x, Rank_1=or_1)
+    x <- mutate(x, Rank_2=or_2)
+    cr <- na.omit(change_rank[,paste0(ticker,"_Rank")])
+    x <- mutate(x, ChangeRank=cr)
+    if (length(dedata) == 0) {
+      dedata <- x[1:(length(x$Rank) - 2),]
+    }
+    else {
+      dedata <- bind_rows(dedata, x[1:(length(x$Rank) - 2),])
+    }
+
+  }
+  dedata
+}
+
+outcome_rank <- get_ranks("Outcome")
+change_rank <- get_ranks("Change")
+
+dedata <- denorm_data_with_ranks(outcome_rank, change_rank)
+```
+```{r year_outcome_view, message=FALSE}
+dedata %>% filter(year(Date) == 1999) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("1999 Outcome")
+dedata %>% filter(year(Date) == 2000) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2000 Outcome")
+dedata %>% filter(year(Date) == 2001) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2001 Outcome")
+dedata %>% filter(year(Date) == 2002) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2002 Outcome")
+dedata %>% filter(year(Date) == 2003) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2003 Outcome")
+dedata %>% filter(year(Date) == 2004) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2004 Outcome")
+dedata %>% filter(year(Date) == 2005) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2005 Outcome")
+dedata %>% filter(year(Date) == 2006) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2006 Outcome")
+dedata %>% filter(year(Date) == 2007) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2007 Outcome")
+dedata %>% filter(year(Date) == 2008) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2008 Outcome")
+dedata %>% filter(year(Date) == 2009) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2009 Outcome")
+dedata %>% filter(year(Date) == 2010) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2010 Outcome")
+dedata %>% filter(year(Date) == 2011) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2011 Outcome")
+dedata %>% filter(year(Date) == 2012) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2012 Outcome")
+dedata %>% filter(year(Date) == 2013) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2013 Outcome")
+dedata %>% filter(year(Date) == 2014) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2014 Outcome")
+dedata %>% filter(year(Date) == 2015) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2015 Outcome")
+dedata %>% filter(year(Date) == 2016) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2016 Outcome")
+dedata %>% filter(year(Date) == 2017) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2017 Outcome")
+dedata %>% filter(year(Date) == 2018) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2018 Outcome")
+dedata %>% filter(year(Date) == 2019) %>% ggplot(aes(Date, Outcome, color=Ticker)) + geom_line() + ylab("2019 Outcome")
+```
+Looking over the years, on an average,
+
+ 1. If a stock falls by 5% to 10% in a week there is an immediate pullback.
+
+ 2. If a stock rises 10% or more in a week, there is a high likelihood that next week will be lackluster.
+
+## Features
+
+### Feature: Today's Rank, yesterday's Rank ...
+Check out each Ticker Rank history.
+ ```{r see-rank, message=FALSE}
+# Check Ranks for each Ticker lifespan
+dedata %>% filter(Ticker == "MMM") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("MMM Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "AXP") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("AXP Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "AAPL") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("AAPL Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "BA") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("BA Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "CAT") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("CAT Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "CVX") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("CVX Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "CSCO") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("CSCO Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "KO") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("KO Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "DOW") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("DOW Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "XOM") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("XOM Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "GS") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("GS Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "HD") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("HD Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "IBM") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("IBM Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "INTC") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("INTC Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "JNJ") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("JNJ Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "JPM") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("JPM Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "MCD") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("MCD Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "MRK") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("MRK Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "MSFT") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("MSFT Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "NKE") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("NKE Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "PFE") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("PFE Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "PG") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("PG Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "RTX") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("RTX Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "TRV") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("TRV Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "UNH") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("UNH Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "VZ") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("VZ Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "V") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("V Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "WMT") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("WMT Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "WBA") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("WBA Rank") + geom_abline(intercept = 1,slope = 0)
+dedata %>% filter(Ticker == "DIS") %>% ggplot(aes(Date, Rank)) + geom_line() + ylab("DIS Rank") + geom_abline(intercept = 1,slope = 0)
+ ```
+In the above charts, the objective was to find persistence in the ranks of a stock based on the common belief that a
+ strong stock remains strong. But none of the stock held the rank 1 for any series of weeks. The same is true, that the worst week stocks also doesn't have any series.
+So, it stands the reason that current week rank plays a role in next week's performance.
+```{r rank-change_rank-relation, include=FALSE}
+# Influence of current week's rank vs next week's rank
+t_rank_change_rank <- table(dedata %>% select(ChangeRank, Rank))
+```
+Rank (Next Day Rank) vs Change Rank(Today's Rank) matrix
+```{r rank-change_rank_plots}
+t_rank_change_rank
+# Lets check the distribution of Rank 1 vs ChangeRank
+as.data.frame(t_rank_change_rank[,1]) %>%
+        ggplot(aes(1:30, t_rank_change_rank[,1])) +
+        geom_point() +
+        ylab("Frequency of Rank 1 Next Week") +
+        xlab("Today's Rank")
+as.data.frame(t_rank_change_rank[,2]) %>%
+        ggplot(aes(1:30, t_rank_change_rank[,2])) +
+        geom_point() +
+        ylab("Frequency of Rank 2 Next Week") +
+        xlab("Today's Rank")
+as.data.frame(t_rank_change_rank[,3]) %>%
+        ggplot(aes(1:30, t_rank_change_rank[,3])) +
+        geom_point() +
+        ylab("Frequency of Rank 3 Next Week") +
+        xlab("Today's Rank")
+```
+
+The 3 graphs clearly show that the top rank frequency comes from previous day rank being between 1-19 and the charts
+ are negatively co-related showing that most top rank comes from higher previous day ranks.
+
+#### Conclusion: Today's Rank is co-related to Next Day's Rank.
+
+## Feature: Percentage Day Change
+Lets visualize how today's percentage day change effect Outcome
+```{r rank-change-relation, message=FALSE}
+boxplot(Change~Rank,data=dedata)
+```
+All the boxes almost overlapped.
+
+#### Conclusion: This week's change is not co-related to Outcome
+
+## Feature: Rate of Close
+Lets visualize how 1 ot more week's rate of change(Close to Close change) effects Outcome.
+```{r roc_rank-relation, message=FALSE}
+cor(dedata$Outcome, dedata$ROC1)
+cor(dedata$Outcome, dedata$ROC2)
+cor(dedata$Rank, dedata$ROC1)
+cor(dedata$Rank, dedata$ROC2)
+```
+
+
+#### Conclusion: No edge found in the distribution using this feature
+
+# Model Building
+
+We will build the best models using Random Set and Timed Set.
+
+### Random Set
+We will divide the whole dataset in a 60% train and 40% test set randomly.
+
+We will be building a linear model, a random forest model, and an xgboost model.
+
+We will learn from linear models which feature set does better and build specific random forest model and an xgboost
+ model as these models take time to build.
+
+
+### Timed Set
+ Building a model with a randomly chosen train set does not allow an understanding of the model based on predicted outcome rank. This does not allow determining the result of buying the best-predicted outcome stock.
+ Next, we will divide the dataset from 1999-2011 as a training set and the rest as a test set. We will call this as timed
+  train and test set
+We will make new models as the random Set models will very likely contain some of the test set values.
+These models will answer the questions
+
+1. If predicted rank 1 was traded what would be the profitability graph.
+
+# Results
+The results are better than random
+
+## Linear Regression Models
+
+### Random Test Set
+
+| Id  | Type              | Rank_Day0     | Rank_Day1 | Rank_Day2 | ROC_1Day | ROC_2Days | Cor       |
+| --- | ----------------- |:-------------:| ---------:| ---------:| --------:| ---------:| ---------:|
+| 1   | Linear Regression | Y             |           |           |          |           | 0.601316  |
+| 2_1 | Linear Regression | Y             |           |           | Y        |           | 0.6020807 |
+| 2_2 | Linear Regression | Y             |           |           |          | Y         | 0.6013089 |
+| 2_3 | Linear Regression | Y             | Y         |           |          |           | 0.6040158 |
+| 2_4 | Linear Regression | Y             |           | Y         |          |           | 0.6036787 |
+| 3_1 | Linear Regression | Y             |           |           | Y        | Y         | 0.602312  |
+| 3_2 | Linear Regression | Y             |           |           | Y        | Y         | 0.6048272 |
+| 3_3 | Linear Regression | Y             |           |           | Y        | Y         | 0.6044473 |
+| 3_4 | Linear Regression | Y             |           |           | Y        | Y         | 0.6040292 |
+| 3_5 | Linear Regression | Y             |           |           | Y        | Y         | 0.6036725 |
+| 3_6 | Linear Regression | Y             |           |           | Y        | Y         | 0.6061185 |
+| 5_1 | Linear Regression | Y             | Y         | Y         | Y        | Y         | 0.6071408 |
+
+#### Best Linear Model
+The model with all the 5 features has a correlation of 0.607 with the actual outcome. It is a weak co-relation but
+statistically significant enough.
+
+We found from linear models that adding all the features gave the best model so we will build Random Forest and
+ XGBoost will all feature. A single feature model will also be built in each case so that we can verify that our expectation is inline.
+
+
+### Timed Test Set
+
+| Id  | Type              | Rank_Day0     | Rank_Day1 | Rank_Day2 | ROC_1Day | ROC_2Days | Cor       |
+| --- | ----------------- |:-------------:| ---------:| ---------:| --------:| ---------:| ---------:|
+| 5_1 | Linear Regression | Y             | Y         | Y         | Y        | Y         | 0.6902775 |
+
+#### Total Profitability per Rank
+
+| Rank| Profit |
+| --- | ------ |
+|  1  | 125.   |
+|  2  | 200.   |
+|  3  | 136.   |
+|  4  | 210.   |
+|  5  | 211.   |
+|  6  | 145.   |
+|  7  | 182.   |
+|  8  |  82.4  |
+|  9  |  43.5  |
+| 10  |  71.0  |
+| 11  | 104.   |
+| 12  |  61.4  |
+| 13  | 256.   |
+| 14  | 148.   |
+| 15  | 164.   |
+| 16  |  54.5  |
+| 17  |  50.2  |
+| 18  |  86.7  |
+| 19  |  22.8  |
+| 20  | 106.   |
+| 21  |  63.8  |
+| 22  |  19.1  |
+| 23  |  35.6  |
+| 24  |  63.0  |
+| 25  |  59.8  |
+| 26  |  96.9  |
+| 27  |  -0.188|
+| 28  |   0.473|
+| 29  |  16.4  |
+| 30  | -14.6  |
+
+#### Rank 1 profitability per Year
+
+| Id  |      Year         | Profit        |
+| --- | ----------------- |:-------------:|
+| 1   |      2012         |  31.1         |
+| 2   |      2013         |  14.8         |
+| 3   |      2014         |  18.6         |
+| 4   |      2015         | -49.2         |
+| 5   |      2016         |  20.0         |
+| 6   |      2017         |  30.0         |
+| 7   |      2018         |  14.8         |
+| 8   |      2019         |  44.5         |
+|     |      Total        | 124.6         |
+
+| Year | Profit |
+| ---- |:------:|
+| 2012 |  31.1 |
+| 2013 |  14.8 |
+| 2014 |  18.6 |
+| 2015 | -49.2 |
+| 2016 |  20.0 |
+| 2017 |  30.0 |
+| 2018 |  14.8 |
+| 2019 |  44.5 |
+| Total | 124.6 |
+
+## Random Forest Models
+
+### Random Test Set
+
+| Id  | Type              | Rank_Day0     | Rank_Day1 | Rank_Day2 | ROC_1Day | ROC_2Days | Cor       |
+| --- | ----------------- |:-------------:| ---------:| ---------:| --------:| ---------:| ---------:|
+| 1   | Random Forest     | Y             |           |           |          |           | 0.6337799 |
+| 5_1 | Random Forest     | Y             | Y         | Y         | Y        | Y         | 0.62619   |
+
+### Timed Test Set
+
+| Id  | Type              | Rank_Day0     | Rank_Day1 | Rank_Day2 | ROC_1Day | ROC_2Days | Cor       |
+| --- | ----------------- |:-------------:| ---------:| ---------:| --------:| ---------:| ---------:|
+| 5_1 | Random Forest     | Y             | Y         | Y         | Y        | Y         | 0.6536283 |
+
+#### Total Profitability per Rank
+
+| Rank| Profit |
+| --- | ------ |
+|  1  | 154.   |
+|  2  | 202.   |
+|  3  | 130.   |
+|  4  | 161.   |
+|  5  | 159.   |
+|  6  | 195.   |
+|  7  | 144.   |
+|  8  |  65.0  |
+|  9  |  95.7  |
+| 10  | 166.   |
+| 11  | 196.   |
+| 12  |  35.7  |
+| 13  | 176.   |
+| 14  |  -0.790|
+| 15  | 106.   |
+| 16  | 102.   |
+| 17  |  92.1  |
+| 18  |  83.1  |
+| 19  | 127.   |
+| 20  |  10.4  |
+| 21  |  -0.665|
+| 22  |  85.4  |
+| 23  |  39.7  |
+| 24  |  90.5  |
+| 25  |   1.14 |
+| 26  |  75.5  |
+| 27  |   8.83 |
+| 28  |  71.3  |
+| 29  |   7.46 |
+| 30  |  22.0  |
+
+#### Rank 1 profitability per Year
+
+| Year | Profit |
+| ---- |:------:|
+| 2012 | 18.4  |
+| 2013 | 37.3  |
+| 2014 | 27.1  |
+| 2015 |  6.63 |
+| 2016 | 14.1  |
+| 2017 | 26.2  |
+| 2018 | 15.9  |
+| 2019 |  8.57 |
+| Total | 154.23 |
+
+## XGBoost Models
+
+### Random Test Set
+
+| Id  | Type              | Rank_Day0     | Rank_Day1 | Rank_Day2 | ROC_1Day | ROC_2Days | Cor       |
+| --- | ----------------- |:-------------:| ---------:| ---------:| --------:| ---------:| ---------:|
+| 1   | XGBoost           | Y             |           |           |          |           | 0.6339214 |
+| 5_1 | XGBoost           | Y             | Y         | Y         | Y        | Y         | 0.6512258 |
+
+### Timed Test Set
+
+| Id  | Type              | Rank_Day0     | Rank_Day1 | Rank_Day2 | ROC_1Day | ROC_2Days | Cor       |
+| --- | ----------------- |:-------------:| ---------:| ---------:| --------:| ---------:| ---------:|
+| 5_1 | XGBoost           | Y             | Y         | Y         | Y        | Y         | 0.6770446 |
+
+#### Total Profitability per Rank
+
+| Rank| Profit |
+| --- | ------ |
+|  1  | 128.   |
+|  2  | 193.   |
+|  3  | 112.   |
+|  4  | 127.   |
+|  5  | 163.   |
+|  6  | 170.   |
+|  7  | 177.   |
+|  8  | 114.   |
+|  9  |  94.1  |
+| 10  | 122.   |
+| 11  | 187.   |
+| 12  |  53.3  |
+| 13  | 190.   |
+| 14  |  83.7  |
+| 15  |  61.4  |
+| 16  |  82.9  |
+| 17  | 104.   |
+| 18  |  47.5  |
+| 19  |  -6.53 |
+| 20  |  81.7  |
+| 21  |  77.9  |
+| 22  | 119.   |
+| 23  |  27.7  |
+| 24  |  85.1  |
+| 25  |  71.3  |
+| 26  |  44.8  |
+| 27  |  23.8  |
+| 28  |  19.0  |
+| 29  |  59.6  |
+| 30  | -14.3  |
+
+#### Rank 1 profitability per Year
+
+| Year | Profit |
+| ---- |:------:|
+| 2012 |  9.93 |
+| 2013 | 24.5  |
+| 2014 |  5.67 |
+| 2015 | -7.08 |
+| 2016 | 30.6  |
+| 2017 |  9.53 |
+| 2018 | 26.2  |
+| 2019 | 29.1  |
+| Total | 128.39 |
+
+# Conclusion
+
+There are many ways to use the best model
+
+1. Rank 1 Trades - Take the stock with the highest predicted long move for the next week.
+
+2. Weighted approach - Take position in all stocks but weight them in proportion to the amount of expected outcome. This also means that you take a short position on a negative expected outcome.
+
+In this paper, the results of taking the Rank 1 trade are evaluated and it is surprising that in most of the years
+ it is profitable.
+
+Overall, Model yearly picture vs DJIA actual yearly return in this period
+
+| Year | LinearR | RamdomF | XGBoost |  DJIA |
+| ---- |:-------:|:-------:|:-------:|:-----:|
+| 2012 |    31.1 |   18.4  |    9.93 |  7.26 |
+| 2013 |    14.8 |   37.3  |   24.5  | 26.50 |
+| 2014 |    18.6 |   27.1  |    5.67 |  7.52 |
+| 2015 |   -49.2 |    6.63 |   -7.08 | -2.23 |
+| 2016 |    20.0 |   14.1  |   30.6  | 13.42 |
+| 2017 |    30.0 |   26.2  |    9.53 | 25.08 |
+| 2018 |    14.8 |   15.9  |   26.2  | -5.63 |
+| 2019 |    44.5 |    8.57 |   29.1  | 22.34 |
+| Total |  124.6 |  154.23 |  128.39 | 94.26 |
+
+Random Forest Model has beaten DJIA 7 out of the last 8 years(Except 2019).
+
+As far as accuracy of the measurement is concerned, this is how the predicted rank 1 vs actual rank on the next week is
+ distributed
+```{r predicted_rank1-rank, include=FALSE}
+load("../tmodels.Rda")
+# Add Prediticted Outcome in the test set and generate rank per date
+td <- cbind(timed_test_set, PredictedOutcome=hat_lm_5_1_t) %>%
+      group_by(Date) %>%
+      mutate(PredictedRank=order(PredictedOutcome, decreasing=TRUE))
+
+# Find the outcome rank 1 overall and by year
+rank1_res <- td %>% filter(PredictedRank == 1) %>% select(Date, Ticker, Rank, PredictedRank, Outcome)
+
+
+trf <- cbind(timed_test_set, PredictedOutcome=hat_rf_5_1_t) %>%
+      group_by(Date) %>%
+      mutate(PredictedRank=order(PredictedOutcome, decreasing=TRUE))
+
+# Find the outcome rank 1 overall and by year
+rank1_rf <- trf %>% filter(PredictedRank == 1) %>% select(Date, Ticker, Rank, PredictedRank, Outcome)
+
+
+# Add Prediticted Outcome in the test set and generate rank per date
+txgb <- cbind(timed_test_set, PredictedOutcome=hat_xgb_5_1_t) %>%
+      group_by(Date) %>%
+      mutate(PredictedRank=order(PredictedOutcome, decreasing=TRUE))
+
+# Find the outcome rank 1 overall and by year
+rank1_xgb <- txgb %>% filter(PredictedRank == 1) %>% select(Date, Ticker, Rank, PredictedRank, Outcome)
+```
+```{r last-rank-hist, message=FALSE}
+rank1_res %>% ggplot(aes(Rank)) +
+  geom_histogram(bins = 30) +
+  ylab("Predicted Rank 1") +
+  xlab("Actual Rank") +
+  ggtitle("Linear Regression Model Predicted Rank 1 vs Actual Rank Distribution")
+rank1_rf %>% ggplot(aes(Rank)) +
+  geom_histogram(bins = 30) +
+  ylab("Predicted Rank 1") +
+  xlab("Actual Rank") +
+  ggtitle("Random Forest Model Predicted Rank 1 vs Actual Rank Distribution")
+rank1_xgb %>% ggplot(aes(Rank)) +
+  geom_histogram(bins = 30) +
+  ylab("Predicted Rank 1") +
+  xlab("Actual Rank") +
+  ggtitle("XGBoost Model Predicted Rank 1 vs Actual Rank Distribution")
+```
+
+
